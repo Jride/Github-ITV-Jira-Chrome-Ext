@@ -1,0 +1,36 @@
+{
+  "name": "GitHub ITV Jira",
+  "version": "0.0.1",
+  "manifest_version": 2,
+  "description": "Inject's a button to the GitHub pages to move the corresponding Jira ticket to either Code Review or Dev Complete",
+  "homepage_url": "https://github.com/ITV",
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "default_locale": "en",
+  "background": {
+    "scripts": [
+      "src/bg/background.js"
+    ],
+    "persistent": true
+  },
+  "permissions": [
+    "storage",
+    "https://github-jira-itv.herokuapp.com/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "https://github.com/ITV/*"
+      ],
+      "js": [
+        "js/jquery/jquery.min.js",
+        "src/inject/main.js",
+        "src/inject/spinner.js",
+        "src/inject/jiraapi.js"
+      ]
+    }
+  ]
+}
