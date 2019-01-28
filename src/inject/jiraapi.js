@@ -38,30 +38,74 @@ function getTicketNumber() {
 
   var projectKey = getProjectKey()
 
-  console.log(projectKey)
-
   var fullBranchName = $('.commit-ref > .css-truncate-target').text().toLowerCase().trim();
   // Strips newlines and empty spaces
   fullBranchName = fullBranchName.replace(/(\r\n|\n|\r)/gm, "");
+
+
   var fullBranchNameArr = fullBranchName.split("/")
+  var branchName = fullBranchNameArr[fullBranchNameArr.length - 1];
+  // Replacing all dashes with underscores
+  branchName = branchName.replace(/-/g, '_');
 
-  console.log(fullBranchName)
-  console.log(fullBranchNameArr)
+  var branchNameArr = branchName.split("_")
 
-  if (fullBranchName.includes(projectKey)) {
-    var fullBranchNameArr = fullBranchName.split("/")
-    var branchName = fullBranchNameArr[fullBranchNameArr.length - 1];
-    var branchNameArr = branchName.split("-")
+  if (branchName.includes(projectKey)) {
     var ticketNum = branchNameArr[1]
-
-    var ticket = branchNameArr[0].toUpperCase() + "-" + ticketNum
+    var ticket = projectKey.toUpperCase() + "-" + ticketNum
     return ticket
+
   } else {
-    return null
+    // No project key in branch name
+    var ticketNum = branchNameArr[0]
+    if(isNaN(ticketNum)) {
+      return null
+    }
+
+    var ticket = projectKey.toUpperCase() + "-" + ticketNum
+    return ticket
   }
 }
 
-function mergeTicket(ticket, transition) {
+function getTicketStatus(ticket, callback) {
+
+  var authToken = getAuthToken()
+
+  var data = {
+    "auth": authToken,
+    "ticket": ticket
+  }
+
+  showSpinner()
+
+  $.ajax({
+    method: "POST",
+    url: "https://github-jira-itv.herokuapp.com/ticketinfo",
+    data: data
+  }).done(function(msg) {
+    hideSpinner()
+    console.log(msg)
+    if (msg.status) {
+      if (msg.status == 200) {
+        callback(msg.body.name)
+      } else {
+        alert("Unable to get the ticket info: " + msg.message)
+      }
+    } else {
+      alert("Unable to get the ticket info. Check the console logs")
+      console.error(msg)
+    }
+  }).fail(function(resp) {
+    hideSpinner()
+    if (resp.responseJSON.message) {
+      console.error(resp.responseJSON.message)
+    } else {
+      console.error(resp.responseText)
+    }
+  });
+}
+
+function moveTicket(ticket, transition) {
 
   var authToken = getAuthToken()
 
@@ -87,7 +131,7 @@ function mergeTicket(ticket, transition) {
     url: "https://github-jira-itv.herokuapp.com/moveticket",
     data: data
   }).done(function(msg) {
-    $("#circularG").hide()
+    hideSpinner()
     if (msg.status) {
       if (msg.status == 200) {
         // Success update the button
@@ -96,14 +140,15 @@ function mergeTicket(ticket, transition) {
         alert("Unable to update the ticket: " + msg.message)
       }
     } else {
-      alert("Unable to update the ticket: " + msg)
+      alert("Unable to update the ticket. Check the console logs")
+      console.error(msg)
     }
   }).fail(function(resp) {
-    $("#circularG").hide()
+    hideSpinner()
     if (resp.responseJSON.message) {
-      console.log(resp.responseJSON.message)
+      console.error(resp.responseJSON.message)
     } else {
-      console.log(resp.responseText)
+      console.error(resp.responseText)
     }
   });
 }

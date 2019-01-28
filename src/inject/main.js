@@ -11,7 +11,7 @@ function isITVPullRequestPage() {
   }
 }
 
-function insertButton() {
+function insertDevCompleteButton(ticket) {
   var newButton = `<div id="jiraTicketDevCompleteButton" style="margin-left: 10px" class="BtnGroup btn-group-merge">
       <button class="btn btn-primary BtnGroup-item">
         Move to Dev Complete
@@ -20,6 +20,16 @@ function insertButton() {
 
   var gitHubMergeButton = $( "button:contains('Merge pull request')" ).parent()
   gitHubMergeButton.after( newButton );
+
+  $( "#jiraTicketDevCompleteButton > button" ).click(function() {
+    $("#jiraTicketDevCompleteButton").hide()
+    showSpinner()
+    moveTicket(ticket, "41")
+  });
+}
+
+function insertTicketStatus() {
+
 }
 
 chrome.extension.sendMessage({}, function(response) {
@@ -36,13 +46,19 @@ chrome.extension.sendMessage({}, function(response) {
 
     addSpinner()
 
-    insertButton()
-
-    $( "#jiraTicketDevCompleteButton > button" ).click(function() {
-      $("#jiraTicketDevCompleteButton").hide()
-      $("#circularG").show()
-      mergeTicket(ticket, "41")
-    });
+    getTicketStatus(ticket, function(ticketStatus) {
+      console.log("Ticket Status: " + ticketStatus)
+      switch (ticketStatus) {
+        case 'To Do':
+        case 'Doing':
+        case 'Code Review':
+        // We only want to show the move to dev complete button if
+        // the current status of the ticket is one of the above
+          insertDevCompleteButton(ticket)
+        default:
+          insertTicketStatus()
+      }
+    })
 
 	}
 	}, 10);

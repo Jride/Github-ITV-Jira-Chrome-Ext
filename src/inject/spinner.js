@@ -187,3 +187,11 @@ function addSpinnerCSS() {
 }`
   $(`<style type='text/css'> ${css} </style>`).appendTo("head");
 }
+
+function showSpinner() {
+  $("#circularG").show()
+}
+
+function hideSpinner() {
+  $("#circularG").hide()
+}
