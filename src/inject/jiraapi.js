@@ -22,7 +22,7 @@ function getProjectKey() {
 
   if (browserUrl.includes("itvplayer-ios")) { return "ipia" }
   if (browserUrl.includes("itvhub-tvos")) { return "tvos" }
-  if (browserUrl.includes("itvplayer_android")) { return "tvos" }
+  if (browserUrl.includes("itvplayer_android")) { return "ipaa" }
 
   return null
 }
@@ -32,9 +32,11 @@ function getTicketNumber() {
   // layout or css class names
 
   // This also will only work if we use the branch naming strategy which
-  // includes the Jira Ticket number
+  // includes the Jira Ticket number.
+  // Example Supported Formats:
   // eg. feature/IPIA-XXXX-my-example-feature
   // eg. feature/XXXX_my_new_feature
+  // eg. IPIA-XXXX_my_new_feature
 
   var projectKey = getProjectKey()
 
@@ -42,9 +44,12 @@ function getTicketNumber() {
   // Strips newlines and empty spaces
   fullBranchName = fullBranchName.replace(/(\r\n|\n|\r)/gm, "");
 
-
-  var fullBranchNameArr = fullBranchName.split("/")
-  var branchName = fullBranchNameArr[fullBranchNameArr.length - 1];
+  if (fullBranchName.includes("/")) {
+    var fullBranchNameArr = fullBranchName.split("/")
+    var branchName = fullBranchNameArr[fullBranchNameArr.length - 1];
+  } else {
+    var branchName = fullBranchName
+  }
   // Replacing all dashes with underscores
   branchName = branchName.replace(/-/g, '_');
 
