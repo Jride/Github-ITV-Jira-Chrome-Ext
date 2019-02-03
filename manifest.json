@@ -29,6 +29,7 @@
         "js/jquery/jquery.min.js",
         "src/inject/main.js",
         "src/inject/spinner.js",
+        "src/inject/ticketstatus.js",
         "src/inject/jiraapi.js"
       ]
     }

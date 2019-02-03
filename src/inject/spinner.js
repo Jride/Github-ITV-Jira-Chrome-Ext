@@ -10,8 +10,7 @@ function addSpinner() {
 <div id="circularG_8" class="circularG"></div>
 </div>`
 
-  var gitHubMergeButton = $( "button:contains('Merge pull request')" ).parent()
-  gitHubMergeButton.after( spinner );
+  $("#jiraTicketActions").after(spinner)
 }
 
 function addSpinnerCSS() {

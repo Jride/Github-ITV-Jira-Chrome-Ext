@@ -27,7 +27,16 @@ function getProjectKey() {
   return null
 }
 
-function getTicketNumber() {
+function fetchTicketFromPage() {
+  return processBranchName($('.commit-ref > .css-truncate-target').text().toLowerCase().trim())
+}
+
+function fetchTicketFromURL() {
+  var browserUrlArr = window.location.href.split("...")
+  return processBranchName(browserUrlArr[1])
+}
+
+function processBranchName(fullBranchName) {
   // Fetches the name of the branch. This could break if GitHub updates its
   // layout or css class names
 
@@ -37,10 +46,9 @@ function getTicketNumber() {
   // eg. feature/IPIA-XXXX-my-example-feature
   // eg. feature/XXXX_my_new_feature
   // eg. IPIA-XXXX_my_new_feature
-
+  // console.log(fullBranchName)
   var projectKey = getProjectKey()
 
-  var fullBranchName = $('.commit-ref > .css-truncate-target').text().toLowerCase().trim();
   // Strips newlines and empty spaces
   fullBranchName = fullBranchName.replace(/(\r\n|\n|\r)/gm, "");
 
@@ -53,6 +61,8 @@ function getTicketNumber() {
   // Replacing all dashes with underscores
   branchName = branchName.replace(/-/g, '_');
 
+  // console.log(branchName)
+
   var branchNameArr = branchName.split("_")
 
   if (branchName.includes(projectKey)) {
@@ -62,12 +72,14 @@ function getTicketNumber() {
 
   } else {
     // No project key in branch name
+    // console.log(branchNameArr)
     var ticketNum = branchNameArr[0]
     if(isNaN(ticketNum)) {
       return null
     }
 
     var ticket = projectKey.toUpperCase() + "-" + ticketNum
+    // console.log(ticket)
     return ticket
   }
 }
@@ -114,8 +126,8 @@ function moveTicket(ticket, transition) {
 
   var authToken = getAuthToken()
 
-  console.log(ticket)
-  console.log(authToken)
+  // console.log(ticket)
+  // console.log(authToken)
 
   // transitions
   // 11 To Do
@@ -140,7 +152,7 @@ function moveTicket(ticket, transition) {
     if (msg.status) {
       if (msg.status == 200) {
         // Success update the button
-        console.log("move ticket was a success!!")
+        // console.log("move ticket was a success!!")
       } else {
         alert("Unable to update the ticket: " + msg.message)
       }
