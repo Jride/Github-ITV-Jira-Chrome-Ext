@@ -138,10 +138,12 @@ function getTicketStatus(ticket, callback) {
     }
   }).fail(function(resp) {
     hideSpinner()
-    if (resp.responseJSON.message) {
+    if (resp.responseJSON.message != undefined) {
       console.error(resp.responseJSON.message)
-    } else {
+    } else if (resp.responseText != undefined) {
       console.error(resp.responseText)
+    } else {
+      console.error(resp)
     }
   });
 }
