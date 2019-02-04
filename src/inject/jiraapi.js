@@ -50,6 +50,7 @@ function fetchTicketFromPage() {
 
 function fetchTicketFromURL() {
   var browserUrlArr = window.location.href.split("...")
+  console.log(browserUrlArr[1])
   return processBranchName(browserUrlArr[1])
 }
 
@@ -67,6 +68,7 @@ function processBranchName(fullBranchName) {
   var projectKey = getProjectKey()
 
   // Strips newlines and empty spaces
+  fullBranchName = fullBranchName.toLowerCase()
   fullBranchName = fullBranchName.replace(/(\r\n|\n|\r)/gm, "");
 
   if (fullBranchName.includes("/")) {
@@ -75,6 +77,7 @@ function processBranchName(fullBranchName) {
   } else {
     var branchName = fullBranchName
   }
+
   // Replacing all dashes with underscores
   branchName = branchName.replace(/-/g, '_');
 
