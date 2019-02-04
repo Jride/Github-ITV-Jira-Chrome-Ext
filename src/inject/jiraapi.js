@@ -10,11 +10,28 @@ function setAuthTokenIfNeeded() {
   // in the browsers local storage
   if (localStorage.jiraAuthToken) { return }
 
-  var username = prompt("Enter Jira Username");
-  var password = prompt("Enter Jira Password");
+  addAuthModal()
+  showAuthModal()
 
-  var encodedToken = btoa(username + ":" + password)
-  localStorage.jiraAuthToken = encodedToken
+  $("button#jiraAuthBtn").click(function() {
+
+    var email = $("#jiraEmail").val()
+    var pwd = $("#jiraPwd").val()
+
+    var emailPattern = /^\b[A-Z0-9._%-]+@[A-Z0-9.-]+\.[A-Z]{2,4}\b$/i
+
+    if (email != "" && pwd !== "" && emailPattern.test(email)) {
+      hideAuthModal()
+      var encodedToken = btoa(email + ":" + pwd)
+      localStorage.jiraAuthToken = encodedToken
+
+      location.reload();
+    } else {
+      showErrMessageAuthModal()
+    }
+
+  })
+
 }
 
 function getProjectKey() {
@@ -88,6 +105,10 @@ function getTicketStatus(ticket, callback) {
 
   var authToken = getAuthToken()
 
+  if (authToken == undefined || authToken == null) {
+    return
+  }
+
   var data = {
     "auth": authToken,
     "ticket": ticket
@@ -101,7 +122,7 @@ function getTicketStatus(ticket, callback) {
     data: data
   }).done(function(msg) {
     hideSpinner()
-    console.log(msg)
+    // console.log(msg)
     if (msg.status) {
       if (msg.status == 200) {
         callback(msg.body.name)
@@ -122,9 +143,41 @@ function getTicketStatus(ticket, callback) {
   });
 }
 
+function processTicketStatus(ticket, devComplete) {
+  getTicketStatus(ticket, function(ticketStatus) {
+
+    var status = ticketStatus.toLowerCase()
+
+    if (devComplete) {
+      if (['to do',
+        'doing',
+        'code review']
+        .includes(status)) {
+          // We only want to show the move to dev complete button if
+          // the current status of the ticket is one of the above
+          insertDevCompleteButton(ticket)
+          return
+      }
+    } else {
+      if (['to do', 'doing']
+        .includes(status)) {
+          insertCodeReviewButton(ticket)
+          return
+      }
+    }
+
+    insertTicketStatus(ticketStatus)
+
+  })
+}
+
 function moveTicket(ticket, transition) {
 
   var authToken = getAuthToken()
+
+  if (authToken == undefined || authToken == null) {
+    return
+  }
 
   // console.log(ticket)
   // console.log(authToken)
@@ -153,6 +206,7 @@ function moveTicket(ticket, transition) {
       if (msg.status == 200) {
         // Success update the button
         // console.log("move ticket was a success!!")
+        processTicketStatus(ticket, transition == 41)
       } else {
         alert("Unable to update the ticket: " + msg.message)
       }

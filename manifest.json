@@ -25,12 +25,18 @@
       "matches": [
         "https://github.com/ITV/*"
       ],
+      "css": [
+        "css/modal.min.css",
+        "css/custom.css"
+      ],
       "js": [
         "js/jquery/jquery.min.js",
+        "js/modal/modal.min.js",
         "src/inject/main.js",
         "src/inject/spinner.js",
         "src/inject/ticketstatus.js",
-        "src/inject/jiraapi.js"
+        "src/inject/jiraapi.js",
+        "src/inject/modal.js"
       ]
     }
   ]

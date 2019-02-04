@@ -68,25 +68,9 @@ function handlePullRequestPage() {
 
   addJiraActionsBlock()
 
-  addSpinnerCSS()
-
   addSpinner()
 
-  getTicketStatus(ticket, function(ticketStatus) {
-
-    if (['to do',
-      'doing',
-      'code review']
-      .includes(ticketStatus.toLowerCase())) {
-        // We only want to show the move to dev complete button if
-        // the current status of the ticket is one of the above
-        insertDevCompleteButton(ticket)
-    } else {
-      addTicketStatusCSS()
-      insertTicketStatus(ticketStatus)
-    }
-
-  })
+  processTicketStatus(ticket, true)
 }
 
 function handleCreatePullRequestPage() {
@@ -97,21 +81,9 @@ function handleCreatePullRequestPage() {
 
     addJiraActionsBlockToCreatePR()
 
-    addSpinnerCSS()
-
     addSpinner()
 
-    getTicketStatus(ticket, function(ticketStatus) {
-
-      if (['to do', 'doing']
-        .includes(ticketStatus.toLowerCase())) {
-          insertCodeReviewButton(ticket)
-      } else {
-        addTicketStatusCSS()
-        insertTicketStatus(ticketStatus)
-      }
-
-    })
+    processTicketStatus(ticket, false)
 
   });
 

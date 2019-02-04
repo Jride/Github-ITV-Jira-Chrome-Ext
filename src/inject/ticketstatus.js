@@ -4,33 +4,6 @@ function insertTicketStatus(status) {
   $("#jiraTicketActions").after(ticketStatus)
 }
 
-function addTicketStatusCSS() {
-  var css = `.ticketstatus {
-    display: block;
-    -webkit-box-sizing: content-box;
-    -moz-box-sizing: content-box;
-    box-sizing: content-box;
-    margin-left: 10px;
-    padding: 10px;
-    float: right;
-    overflow: hidden;
-    border: 2px solid #28a745;
-    -webkit-border-radius: 8px;
-    border-radius: 8px;
-    font: normal 13px/1 "Lucida Console", Monaco, monospace;
-    color: #28a745;
-    text-align: center;
-    -o-text-overflow: ellipsis;
-    text-overflow: ellipsis;
-    background: rgba(1,153,217,0);
-    -webkit-box-shadow: 1px 1px 1px 0 rgba(0,0,0,0.3);
-    box-shadow: 1px 1px 1px 0 rgba(0,0,0,0.3);
-    text-shadow: 1px 1px 1px rgba(0,0,0,0.2);
-  }`
-
-  $(`<style type='text/css'> ${css} </style>`).appendTo("head");
-}
-
 function jiraActionsBlockHTML() {
   return `<div id="JiraTicketBlock">
       <div class="branch-action">
