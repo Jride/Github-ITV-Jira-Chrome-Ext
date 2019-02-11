@@ -4,7 +4,14 @@ function insertTicketStatus(status) {
   $("#jiraTicketActions").after(ticketStatus)
 }
 
+function removeJiraActionsBlockIfNeeded() {
+  $("#JiraTicketBlock").remove()
+}
+
 function jiraActionsBlockHTML() {
+
+  removeJiraActionsBlockIfNeeded()
+
   return `<div id="JiraTicketBlock">
       <div class="branch-action">
       <span class="branch-action-icon" style="

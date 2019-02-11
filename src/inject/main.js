@@ -12,8 +12,11 @@ function isITVGithubProject() {
 
 function isITVPullRequestPage() {
   var browserUrl = window.location.href
-
-  if (browserUrl.includes("/pull/") && isITVGithubProject()) {
+  var splitUrl = browserUrl.split("/")
+  var lastUrlComponent = splitUrl[splitUrl.length - 1]
+  if (browserUrl.includes("/pull/")
+      && isITVGithubProject()
+      && $.isNumeric( lastUrlComponent )) {
     return true
   } else {
     return false
@@ -127,7 +130,7 @@ chrome.runtime.onMessage.addListener(
     if (request.message === 'UPDATE_URL') {
       if (previousWindowLocation !== request.url) {
         previousWindowLocation = request.url
-        setTimeout(function(){ runScript() }, 3000);
+        setTimeout(function(){ runScript() }, 1000);
       }
     }
 });
