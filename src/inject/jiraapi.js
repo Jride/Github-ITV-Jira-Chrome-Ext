@@ -187,17 +187,9 @@ function moveTicket(ticket, transition) {
   // console.log(ticket)
   // console.log(authToken)
 
-  // transitions
-  // 11 To Do
-  // 21 In Progress
-  // 101 Code Review
-  // 41 Dev Complete
-  // 61 Blocked
-  // 31 Done
-
   var data = {
     "auth": authToken,
-    "transition": transition,
+    "transition": transition.id,
     "ticket": ticket
   }
 
@@ -209,9 +201,7 @@ function moveTicket(ticket, transition) {
     hideSpinner()
     if (msg.status) {
       if (msg.status == 200) {
-        // Success update the button
-        // console.log("move ticket was a success!!")
-        processTicketStatus(ticket, transition == 41)
+        processTicketStatus(ticket, transition.name == 'dev complete')
       } else {
         alert("Unable to update the ticket: " + msg.message)
       }
@@ -227,4 +217,71 @@ function moveTicket(ticket, transition) {
       console.error(resp.responseText)
     }
   });
+}
+
+function getTransitionFromRemote(ticket, transitionName, callback) {
+  var authToken = getAuthToken()
+
+  if (authToken == undefined || authToken == null) {
+    callback(null)
+    return
+  }
+
+  var data = {
+    "auth": authToken,
+    "ticket": ticket
+  }
+
+  $.ajax({
+    method: "POST",
+    url: "https://github-jira-itv.herokuapp.com/transitions",
+    data: data
+  }).done(function(msg) {
+    if (msg.status) {
+      if (msg.status == 200) {
+        var key = getProjectKey() + "_transitions"
+        localStorage.setItem(key, JSON.stringify(msg.transitions));
+        getTransitionFromLocal(ticket, transitionName, callback)
+      } else {
+        alert("Unable to get transitions: " + msg.message)
+        callback(null)
+      }
+    } else {
+      alert("Unable to get transitions. Check the console logs")
+      console.error(msg)
+      callback(null)
+    }
+  }).fail(function(resp) {
+    hideSpinner()
+    if (resp.responseJSON.message) {
+      console.error(resp.responseJSON.message)
+    } else {
+      console.error(resp.responseText)
+    }
+  });
+}
+
+function getTransitionFromLocal(ticket, transitionName, callback) {
+  var key = getProjectKey() + "_transitions"
+  var transitionList = JSON.parse(localStorage[key])
+
+  if (transitionName in transitionList) {
+    var response = {}
+    response[transitionName] = transitionList[transitionName]
+    callback({
+      "name": transitionName,
+      "id": transitionList[transitionName]
+    })
+  }
+}
+
+function getTransitionForTicket(ticket, transitionName, callback) {
+
+  var key = getProjectKey() + "_transitions"
+  if (localStorage[key]) {
+    getTransitionFromLocal(ticket, transitionName, callback)
+  } else {
+    getTransitionFromRemote(ticket, transitionName, callback)
+  }
+
 }
