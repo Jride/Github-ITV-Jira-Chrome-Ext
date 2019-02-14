@@ -130,7 +130,7 @@ chrome.runtime.onMessage.addListener(
     if (request.message === 'UPDATE_URL') {
       if (previousWindowLocation !== request.url) {
         previousWindowLocation = request.url
-        setTimeout(function(){ runScript() }, 1000);
+        setTimeout(function(){ runScript() }, 2000);
       }
     }
 });
