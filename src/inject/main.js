@@ -119,6 +119,10 @@ function runScript() {
 
 chrome.extension.sendMessage({}, function(response) {
 
+  if (previousWindowLocation != "") {
+    return
+  }
+
   previousWindowLocation = window.location
   runScript()
 
@@ -127,7 +131,7 @@ chrome.extension.sendMessage({}, function(response) {
 chrome.runtime.onMessage.addListener(
   function(request, sender, sendResponse) {
     // listen for messages sent from background.js
-    if (request.message === 'UPDATE_URL') {
+    if (request.type === 'UPDATE_URL') {
       if (previousWindowLocation !== request.url) {
         previousWindowLocation = request.url
         setTimeout(function(){ runScript() }, 2000);

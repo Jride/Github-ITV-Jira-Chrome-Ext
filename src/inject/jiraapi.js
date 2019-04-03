@@ -119,33 +119,53 @@ function getTicketStatus(ticket, callback) {
 
   showSpinner()
 
-  $.ajax({
-    method: "POST",
-    url: "https://github-jira-itv.herokuapp.com/ticketinfo",
+  var port = chrome.runtime.connect({name: "getTicketStatus"});
+  port.postMessage({
+    type: "request", 
+    method: "post",
+    url: "ticketinfo",
     data: data
-  }).done(function(msg) {
+  });
+  port.onMessage.addListener(function(response) {
+
+    if (response == null || response == undefined) {
+      console.error("response was null or undefined")
+      return
+    }
+
+    var error = response.error
+    var response = response.response
+
     hideSpinner()
-    // console.log(msg)
-    if (msg.status) {
-      if (msg.status == 200) {
-        callback(msg.body.name)
+
+    if (error != null) {
+      handleError(error)
+      return
+    }
+
+    if ("errorMessages" in response) {
+      handleJiraError(response.errorMessages)
+      return
+    }
+
+    if (!("message" in response)) {
+      console.error("Did not get the correct response")
+      return
+    }
+
+    if (response.status) {
+      if (response.status == 200) {
+        callback(response.body.name)
       } else {
-        alert("Unable to get the ticket info: " + msg.message)
+        alert("Unable to get the ticket info: " + response.message)
       }
     } else {
       alert("Unable to get the ticket info. Check the console logs")
-      console.error(msg)
+      console.error(response)
     }
-  }).fail(function(resp) {
-    hideSpinner()
-    if (resp.responseJSON.message != undefined) {
-      console.error(resp.responseJSON.message)
-    } else if (resp.responseText != undefined) {
-      console.error(resp.responseText)
-    } else {
-      console.error(resp)
-    }
+
   });
+
 }
 
 function processTicketStatus(ticket, devComplete) {
@@ -193,30 +213,54 @@ function moveTicket(ticket, transition) {
     "ticket": ticket
   }
 
-  $.ajax({
-    method: "POST",
-    url: "https://github-jira-itv.herokuapp.com/moveticket",
+
+  var port = chrome.runtime.connect({name: "moveTicket"});
+  port.postMessage({
+    type: "request", 
+    method: "post",
+    url: "moveticket",
     data: data
-  }).done(function(msg) {
+  });
+  port.onMessage.addListener(function(response) {
+
+    if (response == null || response == undefined) {
+      console.error("response was null or undefined")
+      return
+    }
+
+    var error = response.error
+    var response = response.response
+
     hideSpinner()
-    if (msg.status) {
-      if (msg.status == 200) {
+
+    if (error != null) {
+      handleError(error)
+      return
+    }
+
+    if ("errorMessages" in response) {
+      handleJiraError(response.errorMessages)
+      return
+    }
+
+    if (!("message" in response)) {
+      console.error("Did not get the correct response")
+      return
+    }
+
+    if (response.status) {
+      if (response.status == 200) {
         processTicketStatus(ticket, transition.name == 'dev complete')
       } else {
-        alert("Unable to update the ticket: " + msg.message)
+        alert("Unable to update the ticket: " + response.message)
       }
     } else {
       alert("Unable to update the ticket. Check the console logs")
-      console.error(msg)
+      console.error(response)
     }
-  }).fail(function(resp) {
-    hideSpinner()
-    if (resp.responseJSON.message) {
-      console.error(resp.responseJSON.message)
-    } else {
-      console.error(resp.responseText)
-    }
+
   });
+
 }
 
 function getTransitionFromRemote(ticket, transitionName, callback) {
@@ -232,33 +276,57 @@ function getTransitionFromRemote(ticket, transitionName, callback) {
     "ticket": ticket
   }
 
-  $.ajax({
-    method: "POST",
-    url: "https://github-jira-itv.herokuapp.com/transitions",
+  var port = chrome.runtime.connect({name: "getTransitionFromRemote"});
+  port.postMessage({
+    type: "request", 
+    method: "post",
+    url: "transitions",
     data: data
-  }).done(function(msg) {
-    if (msg.status) {
-      if (msg.status == 200) {
+  });
+  port.onMessage.addListener(function(response) {
+
+    if (response == null || response == undefined) {
+      console.error("response was null or undefined")
+      return
+    }
+
+    var error = response.error
+    var response = response.response
+
+    hideSpinner()
+
+    if (error != null) {
+      handleError(error)
+      return
+    }
+
+    if ("errorMessages" in response) {
+      handleJiraError(response.errorMessages)
+      return
+    }
+
+    if (!("message" in response)) {
+      console.error("Did not get the correct response")
+      return
+    }
+
+    if (response.status) {
+      if (response.status == 200) {
         var key = getProjectKey() + "_transitions"
-        localStorage.setItem(key, JSON.stringify(msg.transitions));
+        localStorage.setItem(key, JSON.stringify(response.transitions));
         getTransitionFromLocal(ticket, transitionName, callback)
       } else {
-        alert("Unable to get transitions: " + msg.message)
+        alert("Unable to get transitions: " + response.message)
         callback(null)
       }
     } else {
       alert("Unable to get transitions. Check the console logs")
-      console.error(msg)
+      console.error(response)
       callback(null)
     }
-  }).fail(function(resp) {
-    hideSpinner()
-    if (resp.responseJSON.message) {
-      console.error(resp.responseJSON.message)
-    } else {
-      console.error(resp.responseText)
-    }
+
   });
+
 }
 
 function getTransitionFromLocal(ticket, transitionName, callback) {
@@ -283,5 +351,32 @@ function getTransitionForTicket(ticket, transitionName, callback) {
   } else {
     getTransitionFromRemote(ticket, transitionName, callback)
   }
+
+}
+
+function handleError(error) {
+  if (error.responseJSON.message != undefined) {
+    console.error(error.responseJSON.message)
+  } else if (error.responseText != undefined) {
+    console.error(error.responseText)
+  } else {
+    console.error(error)
+  }
+}
+
+function handleJiraError(errors) {
+
+  if (errors.length == 0) { return }
+
+  console.error(errors)
+
+  var errorMessages = "The following errors occured: \n"
+
+  for (let index = 1; index <= a.length; ++index) {
+    let error = errors[index];
+    errorMessages += index + ".) " + error + "\n"
+  }
+
+  alert(errorMessages)
 
 }

@@ -18,9 +18,11 @@
   },
   "permissions": [
     "storage",
-    "https://github-jira-itv.herokuapp.com/*",
     "tabs"
   ],
+  "externally_connectable": {
+    "matches": ["*://*.github-jira-itv.herokuapp.com/*"]
+  },
   "content_scripts": [
     {
       "matches": [
