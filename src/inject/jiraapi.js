@@ -45,7 +45,7 @@ function getProjectKey() {
 }
 
 function fetchTicketFromPage() {
-  return processBranchName($('.commit-ref > .css-truncate-target').text().toLowerCase().trim())
+  return processBranchName($('span.commit-ref.css-truncate.user-select-contain').find( "a > span.css-truncate-target" ).text().toLowerCase().trim())
 }
 
 function fetchTicketFromURL() {
@@ -370,11 +370,12 @@ function handleJiraError(errors) {
 
   console.error(errors)
 
-  var errorMessages = "The following errors occured: \n"
+  var errorMessages = "The following errors occured when trying to fetch the JIRA ticket: \n"
 
-  for (let index = 1; index <= a.length; ++index) {
+  for (let index = 0; index < errors.length; ++index) {
     let error = errors[index];
-    errorMessages += index + ".) " + error + "\n"
+    let num = index + 1
+    errorMessages += num + ".) " + error + "\n"
   }
 
   alert(errorMessages)
