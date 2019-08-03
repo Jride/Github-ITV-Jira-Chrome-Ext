@@ -25,9 +25,26 @@ chrome.runtime.onConnect.addListener(function(port) {
         },
         body: JSON.stringify(request.data)
       })
-      .then(res => res.json())
       .then(function(response) {
-        port.postMessage({response: response, error: null})
+        return response.text()
+      })
+      .then(function(text) {
+        console.log(text)
+
+        try {
+          var jsonResponse = JSON.parse(text);
+          port.postMessage({response: jsonResponse, error: null})
+        } catch (e) {
+
+          if (text.indexOf("Unauthorized") !== -1) {
+            var authError = { 'authError': 'Unauthorized 401' }
+            port.postMessage({response: null, error: authError})
+          } else {
+            port.postMessage({response: null, error: error})
+          }
+
+        }
+        
       })
       .catch(function(error) {
         port.postMessage({response: null, error: error})

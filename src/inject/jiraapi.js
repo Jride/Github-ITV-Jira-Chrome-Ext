@@ -3,14 +3,14 @@ function getAuthToken() {
   return localStorage.jiraAuthToken
 }
 
-function setAuthTokenIfNeeded() {
+function setAuthTokenIfNeeded(authError = false) {
   // If the authentication token hasn't been set yet then
   // this will prompt the user for their username and password.
   // Then it will use base64 encoding to and store the results
   // in the browsers local storage
   if (localStorage.jiraAuthToken) { return }
 
-  addAuthModal()
+  addAuthModal(authError)
   showAuthModal()
 
   $("button#jiraAuthBtn").click(function() {
@@ -132,6 +132,8 @@ function getTicketStatus(ticket, callback) {
       console.error("response was null or undefined")
       return
     }
+
+    console.log(response)
 
     var error = response.error
     var response = response.response
@@ -355,6 +357,14 @@ function getTransitionForTicket(ticket, transitionName, callback) {
 }
 
 function handleError(error) {
+
+  if(error.authError) {
+    console.error("Auth error. Clearing token and presenting login modal.")
+    localStorage.removeItem("jiraAuthToken")
+    setAuthTokenIfNeeded(true)
+    return
+  }
+
   if (error.responseJSON.message != undefined) {
     console.error(error.responseJSON.message)
   } else if (error.responseText != undefined) {
