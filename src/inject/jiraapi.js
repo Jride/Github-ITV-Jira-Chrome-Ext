@@ -45,12 +45,12 @@ function getProjectKey() {
 }
 
 function fetchTicketFromPage() {
-  return processBranchName($('span.commit-ref.css-truncate.user-select-contain').find( "a > span.css-truncate-target" ).text().toLowerCase().trim())
+  return processBranchName($('span.commit-ref.css-truncate.user-select-contain.head-ref').find( "a > span.css-truncate-target" ).text().toLowerCase().trim())
 }
 
 function fetchTicketFromURL() {
   var browserUrlArr = window.location.href.split("...")
-  console.log(browserUrlArr[1])
+  // console.log(browserUrlArr[1])
   return processBranchName(browserUrlArr[1])
 }
 
@@ -85,6 +85,9 @@ function processBranchName(fullBranchName) {
 
   var branchNameArr = branchName.split("_")
 
+  // console.log("Branch Name Array: ")
+  // console.log(branchNameArr)
+
   if (branchName.includes(projectKey)) {
     var ticketNum = branchNameArr[1]
     var ticket = projectKey.toUpperCase() + "-" + ticketNum
@@ -92,7 +95,6 @@ function processBranchName(fullBranchName) {
 
   } else {
     // No project key in branch name
-    // console.log(branchNameArr)
     var ticketNum = branchNameArr[0]
     if(isNaN(ticketNum)) {
       return null
@@ -133,7 +135,7 @@ function getTicketStatus(ticket, callback) {
       return
     }
 
-    console.log(response)
+    // console.log(response)
 
     var error = response.error
     var response = response.response

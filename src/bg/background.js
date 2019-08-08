@@ -29,7 +29,6 @@ chrome.runtime.onConnect.addListener(function(port) {
         return response.text()
       })
       .then(function(text) {
-        console.log(text)
 
         try {
           var jsonResponse = JSON.parse(text);
