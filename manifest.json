@@ -1,6 +1,6 @@
 {
   "name": "GitHub ITV Jira",
-  "version": "0.0.2",
+  "version": "1.0.0",
   "manifest_version": 2,
   "description": "Inject's a button to the GitHub pages to move the corresponding Jira ticket to either Code Review or Dev Complete",
   "homepage_url": "https://github.com/ITV",
