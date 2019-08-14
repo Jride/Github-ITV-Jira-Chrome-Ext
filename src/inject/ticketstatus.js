@@ -1,5 +1,5 @@
 function insertTicketStatus(status) {
-  var ticketStatus = `<div class="BtnGroup btn-group-merge">
+  var ticketStatus = `<div id="jiraTicketStatus" class="BtnGroup btn-group-merge">
   <div class="ticketstatus"> Status: ${status} </div></div>`
   $("#jiraTicketActions").after(ticketStatus)
 }

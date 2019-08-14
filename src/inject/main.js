@@ -40,6 +40,8 @@ function insertDevCompleteButton(ticket) {
       </button>
   </div>`
 
+  removeJiraActions()
+
   $("#jiraTicketActions").after(newButton)
 
   $( "#jiraTicketDevCompleteButton > button" ).click(function() {
@@ -57,12 +59,21 @@ function insertDevCompleteButton(ticket) {
   });
 }
 
+function removeJiraActions() {
+  $("#jiraTicketDevCompleteButton").remove()
+  $("#jiraTicketCodeReviewButton").remove()
+  $("#jiraTicketStatus").remove()
+  $("#jiraErrorMessage").remove()
+}
+
 function insertCodeReviewButton(ticket) {
   var newButton = `<div id="jiraTicketCodeReviewButton" style="margin-left: 10px" class="BtnGroup btn-group-merge">
       <button class="btn btn-primary BtnGroup-item">
         Open Pull Request & Move to Code Review
       </button>
   </div>`
+
+  removeJiraActions()
 
   $("#jiraTicketActions").after(newButton)
 
@@ -79,6 +90,19 @@ function insertCodeReviewButton(ticket) {
     });
 
   });
+}
+
+function displayErrorMessage(errorMessage) {
+  
+  removeJiraActions()
+
+  var errorMessageLabel = `<div id="jiraErrorMessage">
+  <span style="font-weight: 600; color: #f90606; margin: 0px 10px; white-space: pre-line;">
+  ${errorMessage.trim()}
+  </span>
+  </div>`
+
+  $("#jiraTicketActions").after(errorMessageLabel)
 }
 
 function handlePullRequestPage() {

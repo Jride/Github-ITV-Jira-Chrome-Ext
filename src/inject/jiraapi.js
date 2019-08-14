@@ -161,10 +161,10 @@ function getTicketStatus(ticket, callback) {
       if (response.status == 200) {
         callback(response.body.name)
       } else {
-        alert("Unable to get the ticket info: " + response.message)
+        displayErrorMessage("Unable to get the ticket info: " + response.message)
       }
     } else {
-      alert("Unable to get the ticket info. Check the console logs")
+      displayErrorMessage("Unable to get the ticket info. Check the console logs")
       console.error(response)
     }
 
@@ -256,10 +256,10 @@ function moveTicket(ticket, transition) {
       if (response.status == 200) {
         processTicketStatus(ticket, transition.name == 'dev complete')
       } else {
-        alert("Unable to update the ticket: " + response.message)
+        displayErrorMessage("Unable to update the ticket: " + response.message)
       }
     } else {
-      alert("Unable to update the ticket. Check the console logs")
+      displayErrorMessage("Unable to update the ticket. Check the console logs")
       console.error(response)
     }
 
@@ -320,11 +320,11 @@ function getTransitionFromRemote(ticket, transitionName, callback) {
         localStorage.setItem(key, JSON.stringify(response.transitions));
         getTransitionFromLocal(ticket, transitionName, callback)
       } else {
-        alert("Unable to get transitions: " + response.message)
+        displayErrorMessage("Unable to get transitions: " + response.message)
         callback(null)
       }
     } else {
-      alert("Unable to get transitions. Check the console logs")
+      displayErrorMessage("Unable to get transitions. Check the console logs")
       console.error(response)
       callback(null)
     }
@@ -382,14 +382,14 @@ function handleJiraError(errors) {
 
   console.error(errors)
 
-  var errorMessages = "The following errors occured when trying to fetch the JIRA ticket: \n"
+  var errorMessages = "The following errors occured when trying to fetch the JIRA ticket:"
 
   for (let index = 0; index < errors.length; ++index) {
     let error = errors[index];
     let num = index + 1
-    errorMessages += num + ".) " + error + "\n"
+    errorMessages += "\n" + num + ".) " + error
   }
 
-  alert(errorMessages)
+  displayErrorMessage(errorMessages)
 
 }
