@@ -105,11 +105,28 @@ function displayErrorMessage(errorMessage) {
   $("#jiraTicketActions").after(errorMessageLabel)
 }
 
+function displayBranchFormatError() {
+
+  var projectKey = getProjectKey().toUpperCase()
+  var errorMessage = "Unable to extract the Jira Ticket number from the page."
+  errorMessage += "\n\nSome Example Supported Formats:"
+  errorMessage += "\n1.) feature/" + projectKey + "-####-my-example-feature"
+  errorMessage += "\n2.) foo/####_my_new_feature"
+  errorMessage += "\n3.) bar/" + projectKey + "-####_my_new_feature"
+  errorMessage += "\n4.) " + projectKey + "-####_my_new_feature "
+
+  displayErrorMessage(errorMessage)
+}
+
 function handlePullRequestPage() {
   var ticket = fetchTicketFromPage()
-  if (ticket == null) { return }
-
+  
   addJiraActionsBlock()
+
+  if (ticket == null) { 
+    displayBranchFormatError()
+    return 
+  }
 
   addSpinner()
 
@@ -118,9 +135,13 @@ function handlePullRequestPage() {
 
 function handleCreatePullRequestPage() {
   var ticket = fetchTicketFromURL()
-  if (ticket == null) { return }
-
+  
   addJiraActionsBlockToCreatePR()
+
+  if (ticket == null) { 
+    displayBranchFormatError()
+    return 
+  }
 
   addSpinner()
 

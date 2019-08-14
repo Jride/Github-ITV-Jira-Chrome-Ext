@@ -90,6 +90,10 @@ function processBranchName(fullBranchName) {
 
   if (branchName.includes(projectKey)) {
     var ticketNum = branchNameArr[1]
+    if(isNaN(ticketNum)) {
+      return null
+    }
+    
     var ticket = projectKey.toUpperCase() + "-" + ticketNum
     return ticket
 
