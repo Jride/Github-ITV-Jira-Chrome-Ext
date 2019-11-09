@@ -1,0 +1,45 @@
+<div class="select-menu d-inline-block">
+  
+  <div class="BtnGroup position-relative">
+    
+    <button type="button" class="border-right-0 rounded-left-1 btn btn-primary BtnGroup-item js-details-target" aria-expanded="false">
+      Merge pull request
+    </button>
+
+      <details class="details-reset details-overlay BtnGroup-parent">
+        
+        <summary class="btn btn-primary select-menu-button BtnGroup-item" aria-haspopup="menu" role="button"></summary>
+
+        <details-menu class="select-menu-modal position-absolute left-0" style="top: 100%; z-index: 99;" role="menu">
+          
+          <div class="select-menu-list">
+
+            <button class="width-full select-menu-item" type="button">
+              
+              <div class="select-menu-item-text">
+                <span class="select-menu-item-heading">Create a merge commit</span>
+                <span class="description">
+                  All commits from this branch will be added to the base branch via a merge commit.
+                </span>
+              </div>
+            </button>
+
+            <button class="width-full select-menu-item" aria-checked="false" type="button">
+              
+              <div class="select-menu-item-text">
+                <span class="select-menu-item-heading">Squash and merge</span>
+                <span class="description">
+                      The 2 commits
+                      from this branch will be combined into one commit in the base branch.
+                </span>
+              </div>
+            </button>
+            
+          </div>
+
+        </details-menu>
+        
+      </details>
+
+  </div>
+</div>

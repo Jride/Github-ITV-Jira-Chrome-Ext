@@ -53,7 +53,33 @@ function insertDevCompleteButton(ticket) {
         hideSpinner()
         return
       }
-      moveTicket(ticket, transition);
+      moveTicket(ticket, transition, "pull_request");
+    });
+
+  });
+}
+
+function insertBuildingButton(ticket) {
+  var newButton = `<div id="jiraTicketBuildingButton" style="margin-left: 10px" class="BtnGroup btn-group-merge">
+      <button class="btn btn-primary BtnGroup-item">
+        Move to Building
+      </button>
+  </div>`
+
+  removeJiraActions()
+
+  $("#jiraTicketActions").after(newButton)
+
+  $( "#jiraTicketBuildingButton > button" ).click(function() {
+    $("#jiraTicketBuildingButton").hide()
+    showSpinner()
+
+    getTransitionForTicket(ticket, "building", function(transition) {
+      if (transition == null) {
+        hideSpinner()
+        return
+      }
+      moveTicket(ticket, transition, "pull_request");
     });
 
   });
@@ -61,6 +87,7 @@ function insertDevCompleteButton(ticket) {
 
 function removeJiraActions() {
   $("#jiraTicketDevCompleteButton").remove()
+  $("#jiraTicketBuildingButton").remove()
   $("#jiraTicketCodeReviewButton").remove()
   $("#jiraTicketStatus").remove()
   $("#jiraErrorMessage").remove()
@@ -86,7 +113,7 @@ function insertCodeReviewButton(ticket) {
         hideSpinner()
         return
       }
-      moveTicket(ticket, transition);
+      moveTicket(ticket, transition, "open_pull_request");
     });
 
   });
@@ -130,7 +157,7 @@ function handlePullRequestPage() {
 
   addSpinner()
 
-  processTicketStatus(ticket, true)
+  processTicketStatus(ticket, "pull_request")
 }
 
 function handleCreatePullRequestPage() {
@@ -145,7 +172,7 @@ function handleCreatePullRequestPage() {
 
   addSpinner()
 
-  processTicketStatus(ticket, false)
+  processTicketStatus(ticket, "open_pull_request")
 
 }
 

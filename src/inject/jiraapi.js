@@ -176,35 +176,47 @@ function getTicketStatus(ticket, callback) {
 
 }
 
-function processTicketStatus(ticket, devComplete) {
+function processTicketStatus(ticket, pageSource) {
+  
   getTicketStatus(ticket, function(ticketStatus) {
 
     var status = ticketStatus.toLowerCase()
 
-    if (devComplete) {
-      if (['to do',
-        'doing',
-        'code review']
-        .includes(status)) {
-          // We only want to show the move to dev complete button if
-          // the current status of the ticket is one of the above
-          insertDevCompleteButton(ticket)
-          return
-      }
-    } else {
-      if (['to do', 'doing']
-        .includes(status)) {
-          insertCodeReviewButton(ticket)
-          return
-      }
-    }
+    getAllTransitionsForTicket(ticket, function(allTransitions) {
 
-    insertTicketStatus(ticketStatus)
+      switch (pageSource) {
+        case "pull_request":
+
+          if (['to do', 'doing', 'code review'].includes(status)) {
+
+            if ("building" in allTransitions) {
+              insertBuildingButton(ticket)
+              return
+            } else {
+              insertDevCompleteButton(ticket)
+              return
+            }
+
+          }
+          break
+          
+        case "open_pull_request":
+
+          if (['to do', 'doing'].includes(status)) {
+              insertCodeReviewButton(ticket)
+              return
+          }
+          break
+      }
+
+      insertTicketStatus(ticketStatus)
+
+    })
 
   })
 }
 
-function moveTicket(ticket, transition) {
+function moveTicket(ticket, transition, pageSource) {
 
   var authToken = getAuthToken()
 
@@ -258,7 +270,7 @@ function moveTicket(ticket, transition) {
 
     if (response.status) {
       if (response.status == 200) {
-        processTicketStatus(ticket, transition.name == 'dev complete')
+        processTicketStatus(ticket, pageSource)
       } else {
         displayErrorMessage("Unable to update the ticket: " + response.message)
       }
@@ -269,6 +281,78 @@ function moveTicket(ticket, transition) {
 
   });
 
+}
+
+function getAllTransitionsForTicket(ticket, callback) {
+
+  if (!shouldFetchTransitions()) {
+    var key = getProjectKey() + "_transitions"
+    var transitionList = JSON.parse(localStorage[key])
+
+    callback(transitionList)
+    return
+  }
+
+  var authToken = getAuthToken()
+
+  if (authToken == undefined || authToken == null) {
+    callback(null)
+    return
+  }
+
+  var data = {
+    "auth": authToken,
+    "ticket": ticket
+  }
+
+  var port = chrome.runtime.connect({name: "getTransitionFromRemote"});
+  port.postMessage({
+    type: "request", 
+    method: "post",
+    url: "transitions",
+    data: data
+  });
+  port.onMessage.addListener(function(response) {
+
+    if (response == null || response == undefined) {
+      console.error("response was null or undefined")
+      return
+    }
+
+    var error = response.error
+    var response = response.response
+
+    if (error != null) {
+      handleError(error)
+      return
+    }
+
+    if ("errorMessages" in response) {
+      handleJiraError(response.errorMessages)
+      return
+    }
+
+    if (!("message" in response)) {
+      console.error("Did not get the correct response")
+      return
+    }
+
+    if (response.status) {
+      if (response.status == 200) {
+        var key = getProjectKey() + "_transitions"
+        localStorage.setItem(key, JSON.stringify(response.transitions));
+        callback(response.transitions)
+      } else {
+        displayErrorMessage("Unable to get transitions: " + response.message)
+        callback(null)
+      }
+    } else {
+      displayErrorMessage("Unable to get transitions. Check the console logs")
+      console.error(response)
+      callback(null)
+    }
+
+  });
 }
 
 function getTransitionFromRemote(ticket, transitionName, callback) {
@@ -342,22 +426,45 @@ function getTransitionFromLocal(ticket, transitionName, callback) {
   var transitionList = JSON.parse(localStorage[key])
 
   if (transitionName in transitionList) {
-    var response = {}
-    response[transitionName] = transitionList[transitionName]
     callback({
       "name": transitionName,
       "id": transitionList[transitionName]
     })
+  } else {
+    callback(null)
   }
+}
+
+function shouldFetchTransitions() {
+  const oneday = 60 * 60 * 24 * 1000
+
+  let keys = {
+    "transitions": getProjectKey() + "_transitions",
+    "transitionsLastUpdated": getProjectKey() + "_transitions_last_update",
+  }
+
+  var shouldFetchTransitions = true
+
+  var lastUpdated = localStorage[keys.transitionsLastUpdated]
+  var now = new Date()
+  if (lastUpdated) {
+    lastUpdatedDate = Date.parse(lastUpdated)
+    var now = new Date()
+
+    if((now - lastUpdatedDate) < (oneDay*7)) {
+      shouldFetchTransitions = false
+    }
+  }
+
+  return shouldFetchTransitions
 }
 
 function getTransitionForTicket(ticket, transitionName, callback) {
 
-  var key = getProjectKey() + "_transitions"
-  if (localStorage[key]) {
-    getTransitionFromLocal(ticket, transitionName, callback)
-  } else {
+  if (shouldFetchTransitions()) {
     getTransitionFromRemote(ticket, transitionName, callback)
+  } else {
+    getTransitionFromLocal(ticket, transitionName, callback)
   }
 
 }
