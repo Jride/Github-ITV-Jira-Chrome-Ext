@@ -15,21 +15,19 @@ You can install the chrome extension from the [Chrome Web Store](https://chrome.
 
 # Feature branches
 
-When creating a new feature you will need to create a new branch from `develop` with the format below. In the examples below `IPIA-1234` refers to the `id` of the ticket that relates to the feature. Using this `id` will allow the branches to link with Jira. Everything after `IPIA-1234` in the examples below describes the feature using `_` as a separator. This style is also used for branches for bug fixes.
+When creating a new feature you will need to create a new branch from `develop` with the format below. In the examples below `IHIA-1234` refers to the `id` of the ticket that relates to the feature. Using this `id` will allow the branches to link with Jira. Everything after `IHIA-1234` in the examples below describes the feature using `_` as a separator. This style is also used for branches for bug fixes.
 
 ```
-feature/IPIA-1234_some_iOS_feature
-feature/TVOS-1234_some_tvOS_feature
+feature/IHIA-1234_some_iOS_feature
 ```
 
 # Release branches
 
-To create a release branch you need to take a branch from `develop` using the format in the example below where `1.5` represents the version number. If features are needed to be added to the release you can take a branch from the release branch adding the ticket `id` (`IPIA-1234` in the example below) and description as shown in the examples below. In the example below `release/1.5` is the main release branch and the other examples are features that will be merged back into the release branch.
+To create a release branch you need to take a branch from `develop` using the format in the example below where `1.5` represents the version number. If features are needed to be added to the release you can take a branch from the release branch adding the ticket `id` (`IHIA-1234` in the example below) and description as shown in the examples below. In the example below `release/1.5` is the main release branch and the other examples are features that will be merged back into the release branch.
 
 ```
 release/1.5
-release_1_5/IPIA-1234_some_iOS_feature
-release_1_5/TVOS-1234_some_tvOS_feature
+release_1_5/IHIA-1234_some_iOS_feature
 ```
 
 # Work in progress branches
@@ -38,6 +36,5 @@ Work in progress branches are used for long running features that may need to be
 
 ```
 wip_long_running_feature/wip
-wip_long_running_feature/IPIA-1234_some_iOS_feature
-wip_long_running_feature/TVOS-1234_some_tvOS_feature
+wip_long_running_feature/IHIA-1234_some_iOS_feature
 ```

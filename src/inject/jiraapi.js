@@ -61,9 +61,9 @@ function processBranchName(fullBranchName) {
   // This also will only work if we use the branch naming strategy which
   // includes the Jira Ticket number.
   // Example Supported Formats:
-  // eg. feature/IPIA-XXXX-my-example-feature
+  // eg. feature/IHIA-XXXX-my-example-feature
   // eg. feature/XXXX_my_new_feature
-  // eg. IPIA-XXXX_my_new_feature
+  // eg. IHIA-XXXX_my_new_feature
   // console.log(fullBranchName)
   var projectKey = getProjectKey()
 
@@ -187,7 +187,7 @@ function processTicketStatus(ticket, pageSource) {
       switch (pageSource) {
         case "pull_request":
 
-          if (['to do', 'doing', 'code review'].includes(status)) {
+          if (['to do', 'selected for development', 'doing', 'in progress', 'code review'].includes(status)) {
 
             if ("building" in allTransitions) {
               insertBuildingButton(ticket)
@@ -202,7 +202,7 @@ function processTicketStatus(ticket, pageSource) {
           
         case "open_pull_request":
 
-          if (['to do', 'doing'].includes(status)) {
+          if (['to do', 'selected for development', 'doing', 'in progress'].includes(status)) {
               insertCodeReviewButton(ticket)
               return
           }
