@@ -37,9 +37,8 @@ function setAuthTokenIfNeeded(authError = false) {
 function getProjectKey() {
   var browserUrl = window.location.href
 
-  if (browserUrl.includes("itvplayer-ios")) { return "ipia" }
-  if (browserUrl.includes("itvhub-tvos")) { return "tvos" }
-  if (browserUrl.includes("itvplayer_android")) { return "ipaa" }
+  if (browserUrl.includes("itvplayer-ios")) { return "ihia" }
+  if (browserUrl.includes("itvplayer_android")) { return "ihaa" }
 
   return null
 }
