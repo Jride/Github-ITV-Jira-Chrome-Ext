@@ -134,13 +134,14 @@ function displayErrorMessage(errorMessage) {
 
 function displayBranchFormatError() {
 
-  var projectKey = getProjectKey().toUpperCase()
+  var projectKeys = getProjectKeys().join(", ").toUpperCase()
   var errorMessage = "Unable to extract the Jira Ticket number from the page."
   errorMessage += "\n\nSome Example Supported Formats:"
-  errorMessage += "\n1.) feature/" + projectKey + "-####-my-example-feature"
+  errorMessage += "\n1.) feature/{PROJECT_KEY}-####-my-example-feature"
   errorMessage += "\n2.) foo/####_my_new_feature"
-  errorMessage += "\n3.) bar/" + projectKey + "-####_my_new_feature"
-  errorMessage += "\n4.) " + projectKey + "-####_my_new_feature "
+  errorMessage += "\n3.) bar/{PROJECT_KEY}-####_my_new_feature"
+  errorMessage += "\n4.) {PROJECT_KEY}-####_my_new_feature"
+  errorMessage += "\n\n Currently supported PROJECT_KEY's are: [" + projectKeys + "]"
 
   displayErrorMessage(errorMessage)
 }

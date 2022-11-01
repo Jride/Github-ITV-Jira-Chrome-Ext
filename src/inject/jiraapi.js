@@ -34,14 +34,32 @@ function setAuthTokenIfNeeded(authError = false) {
 
 }
 
-function getProjectKey() {
+function getProjectKeys() {
   var browserUrl = window.location.href
 
-  if (browserUrl.includes("itvplayer-ios")) { return "ihia" }
-  if (browserUrl.includes("itvplayer_android")) { return "ihaa" }
+  if (browserUrl.includes("itvplayer-ios")) { 
+    return [
+      "ihia",
+      "vei",
+      "dpi",
+      "eli",
+      "it"
+    ]
+  }
+
+  if (browserUrl.includes("itvplayer_android")) { 
+    return [
+      "ihaa",
+      "vea",
+      "dpa",
+      "ela"
+    ]
+  }
 
   return null
 }
+
+var CURRENT_PROJECT_KEY = null
 
 function fetchTicketFromPage() {
   return processBranchName($('span.commit-ref.css-truncate.user-select-contain.head-ref').find( "a > span.css-truncate-target" ).text().toLowerCase().trim())
@@ -51,6 +69,20 @@ function fetchTicketFromURL() {
   var browserUrlArr = window.location.href.split("...")
   // console.log(browserUrlArr[1])
   return processBranchName(browserUrlArr[1])
+}
+
+function findProjectKeyInBranchName(branchName) {
+
+  var projectKeys = getProjectKeys()
+
+  for (let index = 0; index < projectKeys.length; ++index) {
+    let projectKey = projectKeys[index];
+    if (branchName.includes(projectKey)) {
+      return projectKey
+    }
+  }
+
+  return null
 }
 
 function processBranchName(fullBranchName) {
@@ -64,7 +96,6 @@ function processBranchName(fullBranchName) {
   // eg. feature/XXXX_my_new_feature
   // eg. IHIA-XXXX_my_new_feature
   // console.log(fullBranchName)
-  var projectKey = getProjectKey()
 
   // Strips newlines and empty spaces
   fullBranchName = fullBranchName.toLowerCase()
@@ -87,7 +118,12 @@ function processBranchName(fullBranchName) {
   // console.log("Branch Name Array: ")
   // console.log(branchNameArr)
 
-  if (branchName.includes(projectKey)) {
+  var projectKey = findProjectKeyInBranchName(branchName)
+  if (projectKey == null || projectKey == undefined) {
+    // No project key in branch name
+    return null
+  } else {
+    CURRENT_PROJECT_KEY = projectKey
     var ticketNum = branchNameArr[1]
     if(isNaN(ticketNum)) {
       return null
@@ -95,18 +131,8 @@ function processBranchName(fullBranchName) {
     
     var ticket = projectKey.toUpperCase() + "-" + ticketNum
     return ticket
-
-  } else {
-    // No project key in branch name
-    var ticketNum = branchNameArr[0]
-    if(isNaN(ticketNum)) {
-      return null
-    }
-
-    var ticket = projectKey.toUpperCase() + "-" + ticketNum
-    // console.log(ticket)
-    return ticket
   }
+
 }
 
 function getTicketStatus(ticket, callback) {
@@ -285,7 +311,7 @@ function moveTicket(ticket, transition, pageSource) {
 function getAllTransitionsForTicket(ticket, callback) {
 
   if (!shouldFetchTransitions()) {
-    var key = getProjectKey() + "_transitions"
+    var key = CURRENT_PROJECT_KEY + "_transitions"
     var transitionList = JSON.parse(localStorage[key])
 
     callback(transitionList)
@@ -338,7 +364,7 @@ function getAllTransitionsForTicket(ticket, callback) {
 
     if (response.status) {
       if (response.status == 200) {
-        var key = getProjectKey() + "_transitions"
+        var key = CURRENT_PROJECT_KEY + "_transitions"
         localStorage.setItem(key, JSON.stringify(response.transitions));
         callback(response.transitions)
       } else {
@@ -403,7 +429,7 @@ function getTransitionFromRemote(ticket, transitionName, callback) {
 
     if (response.status) {
       if (response.status == 200) {
-        var key = getProjectKey() + "_transitions"
+        var key = CURRENT_PROJECT_KEY + "_transitions"
         localStorage.setItem(key, JSON.stringify(response.transitions));
         getTransitionFromLocal(ticket, transitionName, callback)
       } else {
@@ -421,7 +447,7 @@ function getTransitionFromRemote(ticket, transitionName, callback) {
 }
 
 function getTransitionFromLocal(ticket, transitionName, callback) {
-  var key = getProjectKey() + "_transitions"
+  var key = CURRENT_PROJECT_KEY + "_transitions"
   var transitionList = JSON.parse(localStorage[key])
 
   if (transitionName in transitionList) {
@@ -438,8 +464,8 @@ function shouldFetchTransitions() {
   const oneday = 60 * 60 * 24 * 1000
 
   let keys = {
-    "transitions": getProjectKey() + "_transitions",
-    "transitionsLastUpdated": getProjectKey() + "_transitions_last_update",
+    "transitions": CURRENT_PROJECT_KEY + "_transitions",
+    "transitionsLastUpdated": CURRENT_PROJECT_KEY + "_transitions_last_update",
   }
 
   var shouldFetchTransitions = true
