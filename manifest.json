@@ -1,7 +1,7 @@
 {
   "name": "GitHub ITV Jira",
-  "version": "1.5.0",
-  "manifest_version": 2,
+  "version": "1.6.0",
+  "manifest_version": 3,
   "description": "Inject's a button to the GitHub pages to move the corresponding Jira ticket to either Code Review / Building / Dev Complete",
   "homepage_url": "https://github.com/Jride/Github-ITV-Jira-Chrome-Ext",
   "icons": {
@@ -11,10 +11,7 @@
   },
   "default_locale": "en",
   "background": {
-    "scripts": [
-      "src/bg/background.js"
-    ],
-    "persistent": true
+    "service_worker": "src/bg/background.js"
   },
   "permissions": [
     "storage",

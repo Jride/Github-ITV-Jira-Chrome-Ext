@@ -190,7 +190,7 @@ function runScript() {
   }
 }
 
-chrome.extension.sendMessage({}, function(response) {
+chrome.runtime.sendMessage({}, function(response) {
 
   if (previousWindowLocation != "") {
     return
