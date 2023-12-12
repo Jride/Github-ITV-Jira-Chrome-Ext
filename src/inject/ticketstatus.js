@@ -53,5 +53,5 @@ function addJiraActionsBlock() {
 
 function addJiraActionsBlockToCreatePR() {
   var html = jiraActionsBlockHTML()
-  $('.timeline-comment-wrapper.timeline-new-comment.composer > div.timeline-comment').after(html)
+  $('.timeline-comment-wrapper.timeline-new-comment.composer').after(html)
 }
